@@ -9,7 +9,7 @@ import random
 import math
 import os
 
-# --- Constants for Game Mechanics ---
+# Constants for Game Mechanics
 BASE_CATCH_RATE_COMMON = 0.60
 BASE_CATCH_RATE_UNCOMMON = 0.45
 BASE_CATCH_RATE_RARE = 0.30
@@ -21,34 +21,34 @@ EXP_TO_NEXT_LEVEL_BASE = 100
 EXP_TO_NEXT_LEVEL_MULTIPLIER = 1.2
 STAT_GROWTH_PER_LEVEL = 0.1 # Percentage increase in base stats per monster level
 
-# --- Helper Functions (Type Effectiveness, Stat Calculation) ---
+# Helper Functions (Type Effectiveness, Stat Calculation)
 # This dictionary defines type effectiveness: {ATTACKER_TYPE: {DEFENDER_TYPE: MULTIPLIER}}
 # A multiplier > 1 means super effective, < 1 means not very effective, 0 means no effect.
 TYPE_EFFECTIVENESS = {
     MonsterType.FIRE: {
         MonsterType.GRASS: 2.0, # Fire beats Grass
         MonsterType.WATER: 0.5, # Fire weak to Water
-        MonsterType.AIR: 2.0, # Fire beats Air (e.g., hot air rises, dispels clouds)
-        MonsterType.EARTH: 0.5, # Fire weak to Earth (e.g., earth smothers fire)
+        MonsterType.AIR: 2.0, # Fire beats Air 
+        MonsterType.EARTH: 0.5, # Fire weak to Earth 
         MonsterType.ELECTRIC: 1.0,
     },
     MonsterType.WATER: {
         MonsterType.FIRE: 2.0, # Water beats Fire
         MonsterType.ELECTRIC: 0.5, # Water weak to Electric
-        MonsterType.EARTH: 2.0, # Water beats Earth (e.g., erosion)
+        MonsterType.EARTH: 2.0, # Water beats Earth 
         MonsterType.GRASS: 0.5, # Water weak to Grass
         MonsterType.AIR: 1.0,
     },
     MonsterType.GRASS: {
         MonsterType.WATER: 2.0, # Grass beats Water
         MonsterType.FIRE: 0.5, # Grass weak to Fire
-        MonsterType.EARTH: 2.0, # Grass beats Earth (e.g., roots break ground)
-        MonsterType.AIR: 0.5, # Grass weak to Air (e.g., wind dispersal)
+        MonsterType.EARTH: 2.0, # Grass beats Earth 
+        MonsterType.AIR: 0.5, # Grass weak to Air 
         MonsterType.ELECTRIC: 1.0,
     },
     MonsterType.ELECTRIC: {
         MonsterType.WATER: 2.0, # Electric beats Water
-        MonsterType.EARTH: 0.5, # Electric weak to Earth (e.g., grounded)
+        MonsterType.EARTH: 0.5, # Electric weak to Earth 
         MonsterType.AIR: 2.0, # Electric beats Air
         MonsterType.FIRE: 1.0,
         MonsterType.GRASS: 1.0,
@@ -56,16 +56,16 @@ TYPE_EFFECTIVENESS = {
     MonsterType.EARTH: {
         MonsterType.ELECTRIC: 2.0, # Earth beats Electric
         MonsterType.WATER: 0.5, # Earth weak to Water
-        MonsterType.AIR: 0.5, # Earth weak to Air (e.g., wind erosion)
+        MonsterType.AIR: 0.5, # Earth weak to Air 
         MonsterType.FIRE: 2.0, # Earth beats Fire
         MonsterType.GRASS: 0.5, # Earth weak to Grass
     },
     MonsterType.AIR: {
-        MonsterType.EARTH: 2.0, # Air beats Earth (e.g., erosion)
-        MonsterType.FIRE: 0.5, # Air weak to Fire (e.g., fire consumes oxygen)
+        MonsterType.EARTH: 2.0, # Air beats Earth 
+        MonsterType.FIRE: 0.5, # Air weak to Fire 
         MonsterType.ELECTRIC: 0.5, # Air weak to Electric
         MonsterType.WATER: 1.0,
-        MonsterType.GRASS: 2.0, # Air beats Grass (e.g., wind dispersal)
+        MonsterType.GRASS: 2.0, # Air beats Grass 
     }
 }
 
@@ -85,7 +85,7 @@ def get_type_effectiveness_multiplier(attacker_type, defender_type):
     """
     return TYPE_EFFECTIVENESS.get(attacker_type, {}).get(defender_type, 1.0)
 
-# --- Game Functions (Partner A Responsibilities) ---
+# Game Functions 
 
 def create_player(session, username):
     """
@@ -232,10 +232,10 @@ def get_player_collection(session, player_id):
 
     for i, pm in enumerate(player.monsters):
         print(f"{i+1}. {pm.nickname} ({pm.species.name}) - Lv.{pm.level} | Type: {pm.species.type.value} | HP: {pm.current_hp}/{pm.max_hp} | Atk: {pm.attack} | Def: {pm.defense} | Spd: {pm.speed}")
-    print("------------------------------------------")
+    print("--------------")
     return player.monsters
 
-# --- CLI Commands ---
+# CLI Commands
 
 def handle_start(args):
     """
@@ -372,11 +372,8 @@ def main():
 
     args = parser.parse_args()
 
-    # Before running any command, ensure the database is initialized.
-    # We can move this to a separate init script or check if db file exists.
-    # For now, let's ensure tables are created on every run, or a dedicated 'init-db' command.
     # If the user doesn't call init-db, ensure tables are created when they start the game.
-    if args.command != 'init-db': # Avoid calling twice if explicitly initializing
+    if args.command != 'init-db': 
         # Check if the database file exists. If not, create and seed it.
         if not os.path.exists('monster_game.db'):
             print("Database 'monster_game.db' not found. Initializing and seeding...")
