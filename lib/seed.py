@@ -1,6 +1,7 @@
-from .models import MonsterSpecies, Player, PlayerMonster, Battle, Trade, Achievement, MonsterType, MonsterRarity, Session, create_all_tables
+from models import MonsterSpecies, Player, PlayerMonster, Battle, Trade, Achievement, MonsterType, MonsterRarity
 from sqlalchemy.exc import IntegrityError
-import random
+from debug import init_db, Session
+
 
 # Seed data for Monster Species
 # Base stats (HP, Attack, Defense, Speed) are kept relatively low for initial levels
@@ -41,7 +42,8 @@ def seed_database():
     """
     Creates all tables and populates the MonsterSpecies table with initial data.
     """
-    create_all_tables() # Ensure all tables are created
+    init_db()
+ # Ensure all tables are created
 
     session = Session()
     try:
