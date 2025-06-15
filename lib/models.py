@@ -6,14 +6,14 @@ from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime, timezone
 from enum import Enum
 
-# Naming convention for constraints
+# Constraint naming convention
 convention = {
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
 }
 metadata = MetaData(naming_convention=convention)
 Base = declarative_base(metadata=metadata)
 
-# Defining an Enum for MonsterType to restrict a column to specific values
+# Enums for Monster properties
 class MonsterType(Enum):
     FIRE = "Fire"
     WATER = "Water"
@@ -29,7 +29,7 @@ class MonsterRarity(Enum):
     EPIC = "Epic"
     LEGENDARY = "Legendary"
 
-# Monster species
+# Monster species template
 class MonsterSpecies(Base):
     __tablename__ = 'monster_species'
 
@@ -41,14 +41,14 @@ class MonsterSpecies(Base):
     base_defense = Column(Integer, nullable=False)
     base_speed = Column(Integer, nullable=False)
     rarity = Column(SqlEnum(MonsterRarity), nullable=False)
-    abilities = Column(String)  # Comma-separated
+    abilities = Column(String)
 
     player_monsters = relationship("PlayerMonster", back_populates="species")
 
     def __repr__(self):
         return f"<MonsterSpecies(id={self.id}, name='{self.name}', type='{self.type.value}')>"
 
-# Individual owned monsters
+# Player-owned monster instance
 class PlayerMonster(Base):
     __tablename__ = 'player_monsters'
 
@@ -71,39 +71,35 @@ class PlayerMonster(Base):
         return (f"<PlayerMonster(id={self.id}, nickname='{self.nickname or self.species.name}', "
                 f"player_id={self.player_id}, species_id={self.species_id}, level={self.level})>")
 
-
-# PlayerMonster table (Individual monster instances owned by players)
-class PlayerMonster(Base):
-    __tablename__ = 'player_monsters'
+# Player profile
+class Player(Base):
+    __tablename__ = 'players'
 
     id = Column(Integer, primary_key=True)
-    player_id = Column(Integer, ForeignKey('players.id'), nullable=False)
-    species_id = Column(Integer, ForeignKey('monster_species.id'), nullable=False)
-    nickname = Column(String) 
+    username = Column(String, nullable=False, unique=True)
     level = Column(Integer, default=1)
-    current_hp = Column(Integer, nullable=False)
-    max_hp = Column(Integer, nullable=False) # Derived from base_hp and level
-    attack = Column(Integer, nullable=False) 
-    defense = Column(Integer, nullable=False) 
-    speed = Column(Integer, nullable=False) 
-    experience = Column(Integer, default=0) # Experience towards thee next level
+    experience = Column(Integer, default=0)
+    money = Column(Integer, default=0)
 
-    # Relationships to Player and MonsterSpecies
-    player = relationship("Player", back_populates="monsters")
-    species = relationship("MonsterSpecies", back_populates="player_monsters")
+    monsters = relationship("PlayerMonster", back_populates="player")
+    battles_as_player1 = relationship("Battle", foreign_keys="[Battle.player1_id]", back_populates="player1")
+    battles_as_player2 = relationship("Battle", foreign_keys="[Battle.player2_id]", back_populates="player2")
+    trades_as_from_player = relationship("Trade", foreign_keys="[Trade.from_player_id]", back_populates="from_player")
+    trades_as_to_player = relationship("Trade", foreign_keys="[Trade.to_player_id]", back_populates="to_player")
+    achievements = relationship("Achievement", secondary="player_achievements", back_populates="players")
 
     def __repr__(self):
-        return (f"<PlayerMonster(id={self.id}, nickname='{self.nickname or self.species.name}', "
-                f"player_id={self.player_id}, species_id={self.species_id}, level={self.level})>")
+        return f"<Player(id={self.id}, username='{self.username}', level={self.level})>"
 
-# Battle history
+# Battle log
 class Battle(Base):
     __tablename__ = 'battles'
 
     id = Column(Integer, primary_key=True)
     player1_id = Column(Integer, ForeignKey('players.id'), nullable=False)
     player2_id = Column(Integer, ForeignKey('players.id'), nullable=False)
-    winner_id = Column(Integer, ForeignKey('players.id'), nullable=True)
+    winner_id = Column(Integer, ForeignKey('players.id'))
+
     battle_log = Column(String)
     timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
@@ -114,7 +110,7 @@ class Battle(Base):
     def __repr__(self):
         return f"<Battle(id={self.id}, player1_id={self.player1_id}, player2_id={self.player2_id}, winner_id={self.winner_id})>"
 
-# Monster trades
+# Monster trade system
 class Trade(Base):
     __tablename__ = 'trades'
 
@@ -135,7 +131,7 @@ class Trade(Base):
         return (f"<Trade(id={self.id}, from_player_id={self.from_player_id}, to_player_id={self.to_player_id}, "
                 f"status='{self.status}')>")
 
-# Achievements
+# Achievements table
 class Achievement(Base):
     __tablename__ = 'achievements'
 
@@ -148,7 +144,7 @@ class Achievement(Base):
     def __repr__(self):
         return f"<Achievement(id={self.id}, name='{self.name}')>"
 
-# Many-to-many rel between Player and Achievement
+# Association table for many-to-many (players <-> achievements)
 class PlayerAchievement(Base):
     __tablename__ = 'player_achievements'
 
