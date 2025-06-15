@@ -1,10 +1,9 @@
-# lib/cli.py
-
 import argparse
 from sqlalchemy.orm import sessionmaker, joinedload
 from sqlalchemy import create_engine
-from .models import Base, Player, MonsterSpecies, PlayerMonster, MonsterType, MonsterRarity, Session, engine
-from .seed import seed_database
+from lib.models import Base, Player, MonsterSpecies, PlayerMonster, MonsterType, MonsterRarity
+from lib.seed import seed_database
+from lib.debug import Session,engine
 import random
 import math
 import os

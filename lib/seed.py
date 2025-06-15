@@ -1,6 +1,6 @@
-from models import MonsterSpecies, Player, PlayerMonster, Battle, Trade, Achievement, MonsterType, MonsterRarity
+from lib.models import MonsterSpecies, Player, PlayerMonster, Battle, Trade, Achievement, MonsterType, MonsterRarity
 from sqlalchemy.exc import IntegrityError
-from debug import init_db, Session
+from lib.debug import init_db, Session
 
 
 # Seed data for Monster Species
